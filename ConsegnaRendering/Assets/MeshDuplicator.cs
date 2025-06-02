@@ -1,24 +1,28 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class MeshDuplicator : MonoBehaviour
 {
 
-    private List<GameObject> pooledObject = new List<GameObject>();
-    private int amountToPool = 200;
-    //Input input;
+    List<GameObject> pooledObject = new List<GameObject>();
+    int amountToPool = 200;
 
-    public float activeTime = 2f;
-    public Material mat;
-    public float meshRefereshRate = 0.1f;
+    Input input;
+
+    [SerializeField] float activeTime = 2f;
+    [SerializeField] Material mat;
+    [SerializeField] float meshRefereshRate = 0.1f;
+
     private SkinnedMeshRenderer[] skinnedMeshRenderers;
-    public float MeshTime = 3;
-
+    [SerializeField] float MeshTime = 3;
 
     private void Awake()
     {
-        //input = new Input();
+        input = new Input();
+        input.Enable();
         for (int i = 0; i < amountToPool; i++)
         {
             GameObject obj = new GameObject();
@@ -29,30 +33,19 @@ public class MeshDuplicator : MonoBehaviour
         }
     }
 
-    //private void OnEnable()
-    //{
-    //    input.Shader.AfterImage.performed+=AfterImage;
-    //}
-
-    //private void OnDisable()
-    //{
-    //    input.Shader.AfterImage.performed -= AfterImage;
-    //}
-
-
-    //private void AfterImage(InputAction.CallbackContext context)
-    //{
-    //    Debug.Log("sium");
-    //    StartCoroutine(ActivateTrail(activeTime));
-    //}
-
-
-    void Update()
+    private void OnEnable()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            StartCoroutine(ActivateTrail(activeTime));
-        }
+        input.Shader.AfterImage.started += AfterImage;
+    }
+
+    private void OnDisable()
+    {
+        input.Shader.AfterImage.started -= AfterImage;
+    }
+
+    private void AfterImage(InputAction.CallbackContext context)
+    {
+        StartCoroutine(ActivateTrail(activeTime));
     }
 
     public GameObject GetPooledObject()
